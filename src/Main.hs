@@ -8,9 +8,12 @@ import Text.Parsec.Char
 
 type Parser = Parsec String ()
 
-main =
-  print . (+ 3) . (read :: String -> Double) . fromRight' $
-  parse double "" "-2.0"
+main = do
+  let x = "2.0"
+  print $ parse expr "" x
+
+expr :: Parser String
+expr = double <* eof
 
 double :: Parser String
 double = perhap minus id (:) <*> many1 digit <**> perhap decimal id (flip (++))
