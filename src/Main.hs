@@ -1,13 +1,16 @@
 module Main where
 
 import Control.Applicative hiding (some)
+import Data.Either.Combinators
 import Data.Void
 import Text.Parsec
 import Text.Parsec.Char
 
 type Parser = Parsec String ()
 
-main = parseTest double "-2.0"
+main =
+  print . (+ 3) . (read :: String -> Double) . fromRight' $
+  parse double "" "-2.0"
 
 double :: Parser String
 double = perhap minus id (:) <*> many1 digit <**> perhap decimal id (flip (++))
