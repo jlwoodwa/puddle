@@ -1,3 +1,4 @@
 puddle.cabal
 .stack-work
 stack.yaml.lock
+*.swp
