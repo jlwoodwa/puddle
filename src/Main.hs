@@ -1,23 +1,22 @@
 module Main where
 
-import Control.Applicative hiding (some)
+import Control.Applicative hiding (optional, some)
 import Data.Void
-import Text.Megaparsec
-import Text.Megaparsec.Char
+import Text.Parsec
+import Text.Parsec.Char
 
-type Parser = Parsec Void String
+type Parser = Parsec String ()
 
 main = parseTest double "-2.0"
 
 double :: Parser String
-double =
-  perhap minus id (:) <*> some digitChar <**> perhap decimal id (flip (++))
+double = perhap minus id (:) <*> many1 digit <**> perhap decimal id (flip (++))
 
 minus :: Parser (Maybe Char)
-minus = optional $ char '-'
+minus = optionMaybe $ char '-'
 
 decimal :: Parser (Maybe String)
-decimal = optional $ char '.' <:> some digitChar
+decimal = optionMaybe $ char '.' <:> many1 digit
 
 -- Utility functions
 (<:>) = liftA2 (:)
