@@ -16,7 +16,7 @@ toOp :: Char -> Op
 toOp = fromJust . flip lookup [('+', Add), ('*', Mult), ('-', Sub), ('/', Div)]
 
 main = do
-  let x = "2.0"
+  let x = "2.0+3"
   print $ parse (math <* eof) "" x
 
 numb :: Parser Math
@@ -26,10 +26,10 @@ op :: Parser Op
 op = toOp <$> oneOf "+*-/"
 
 expr :: Parser Math
-expr = undefined
+expr = Expr <$> math <*> op <*> math
 
 math :: Parser Math
-math = numb <|> expr
+math = try numb <|> expr
 
 double :: Parser String
 double = perhap minus id (:) <*> many1 digit <**> perhap decimal id (flip (++))
