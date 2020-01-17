@@ -1,10 +1,20 @@
+
 module Main where
 
 import Control.Applicative hiding ((<|>))
+import Control.Monad
 import Data.Maybe
+import Data.Either.Extra
 import Data.Void
 import Text.Parsec
 import Text.Parsec.Char
+
+eval :: Math -> Double
+eval (Numb x) = x
+eval (Expr a Add b) = eval a + eval b
+eval (Expr a Mult b) = eval a * eval b
+eval (Expr a Sub b) = eval a - eval b
+eval (Expr a Div b) = eval a / eval b
 
 type Parser = Parsec String ()
 
@@ -24,8 +34,9 @@ toOp :: Char -> Op
 toOp = fromJust . flip lookup [('+', Add), ('*', Mult), ('-', Sub), ('/', Div)]
 
 main = do
-  let x = "-2.0+3"
-  print $ parse (math <* eof) "" x
+  forever $ do
+    x <- getLine
+    print . eval . fromRight' $ parse (math <* eof) "" x
 
 numb :: Parser Math
 numb = Numb . read <$> double
