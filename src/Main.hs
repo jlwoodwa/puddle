@@ -1,8 +1,6 @@
 module Main where
 
 import Control.Applicative hiding ((<|>), some)
-import Data.Either.Combinators
-import Data.Function
 import Data.Maybe
 import Data.Void
 import Text.Parsec
@@ -26,7 +24,7 @@ toOp :: Char -> Op
 toOp = fromJust . flip lookup [('+', Add), ('*', Mult), ('-', Sub), ('/', Div)]
 
 main = do
-  let x = "-2.0"
+  let x = "-2.0+3"
   print $ parse (math <* eof) "" x
 
 numb :: Parser Math
@@ -47,8 +45,7 @@ double = char '-' ?: many1 digit <? (char '.' <:> many1 digit)
 -- Utility functions
 (<:>) = liftA2 (:)
 
-perhap parser def op = maybe def op <$> optionMaybe parser
-
+-- The "optionality" parser combinators
 (?>) :: Semigroup a => Parser a -> Parser a -> Parser a
 mx ?> my = try (mx <> my) <|> my
 
