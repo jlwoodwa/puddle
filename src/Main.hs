@@ -1,6 +1,6 @@
 module Main where
 
-import Control.Applicative hiding ((<|>), some)
+import Control.Applicative hiding ((<|>))
 import Data.Maybe
 import Data.Void
 import Text.Parsec
@@ -33,19 +33,17 @@ numb = Numb . read <$> double
 op :: Parser Op
 op = toOp <$> oneOf "+*-/"
 
-expr :: Parser Math
-expr = Expr <$> math <*> op <*> math
+expr1 :: Parser Math
+expr1 = try (Expr <$> expr2 <*> fmap toOp (oneOf "+-") <*> expr1) <|> expr2
 
--- I've figured out why this doesn't work.
---
--- `try numb` doesn't actually fail on an expression - it reads the first number
--- successfully. Only after that does the entire `math` parser fail on the
--- unexpected operator.
---
--- But I can't flip `numb` and `expr`, because that leads to infinite recursion
--- without end.
+expr2 :: Parser Math
+expr2 = try (Expr <$> expr3 <*> fmap toOp (oneOf "/*") <*> expr2) <|> expr3
+
+expr3 :: Parser Math
+expr3 = try (char '(' *> expr1 <* char ')') <|> numb
+
 math :: Parser Math
-math = try numb <|> expr
+math = expr1
 
 double :: Parser String
 double = char '-' ?: many1 digit <? (char '.' <:> many1 digit)
