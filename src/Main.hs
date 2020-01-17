@@ -8,14 +8,33 @@ import Data.Void
 import Text.Parsec
 import Text.Parsec.Char
 
-eval :: Math -> Double
-eval (Numb x) = x
-eval (Expr a Add b) = eval a + eval b
-eval (Expr a Mult b) = eval a * eval b
-eval (Expr a Sub b) = eval a - eval b
-eval (Expr a Div b) = eval a / eval b
+main = do
+	let x = "if 2 = 3 then 1 else 0"
+	print $ parse (code <* eof) "" x
+--   forever $ do
+--     x <- getLine
+--     print . eval . handler $ parse (math <* eof) "" x
 
 type Parser = Parsec String ()
+
+-- code interpreter
+
+data Code = Numerical Math | Boolean Bool | Decision Code Code Code
+
+evalC (Numerical x) = x
+evalC (Boolean x) = x
+evalC (Decision (Boolean b) x y) = if b then x else y
+evalC (Decision _ _ _) = error "invalid decision structure"
+
+-- math interpreter
+
+evalM :: Math -> Double
+evalM (Numb x) = x
+evalM (Expr a Add b) = evalM a + evalM b
+evalM (Expr a Mult b) = evalM a * evalM b
+evalM (Expr a Sub b) = evalM a - evalM b
+evalM (Expr a Div b) = evalM a / evaMl b
+
 
 data Math
   = Numb Double
@@ -32,14 +51,6 @@ data Op
 toOp :: Char -> Op
 toOp = fromJust . flip lookup [('+', Add), ('*', Mult), ('-', Sub), ('/', Div)]
 
-main = do
-  forever $ do
-    x <- getLine
-    print . eval . handler $ parse (math <* eof) "" x
-
-handler :: Either ParseError Math -> Math
-handler (Right x) = x
-handler (Left e) = error $ show e
 
 numb :: Parser Math
 numb = Numb . read <$> double
@@ -67,6 +78,10 @@ double = char '-' ?: many1 digit <? (char '.' <:> many1 digit)
 
 wrapSpaces :: Parser a -> Parser a
 wrapSpaces x = spaces *> x <* spaces
+
+handler :: Either ParseError a -> a
+handler (Right x) = x
+handler (Left e) = error $ show e
 
 -- The "optionality" parser combinators
 (?>) :: Semigroup a => Parser a -> Parser a -> Parser a
