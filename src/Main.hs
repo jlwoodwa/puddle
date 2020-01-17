@@ -9,7 +9,7 @@ import Text.Parsec
 import Text.Parsec.Char
 
 main = do
-  let x = "if 2 = 3 then 1 else 0"
+  let x = "2.3+3.2" -- "if 2 = 3 then 1 else 0"
   print . evalC . handler $ parse (code <* eof) "" x
 
 type Parser = Parsec String ()
@@ -21,7 +21,7 @@ data Code
   deriving (Show)
 
 data Value
-  = Numerical Double
+  = Numerical Math
   | Boolean Bool
   deriving (Show)
 
@@ -34,7 +34,7 @@ evalC (Decision (Val (Boolean b)) x y) =
 evalC (Decision _ _ _) = error "invalid decision structure"
 
 code :: Parser Code
-code = undefined
+code = Val . Numerical <$> math
 
 -- math interpreter
 evalM :: Math -> Double
