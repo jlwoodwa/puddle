@@ -2,13 +2,11 @@ module Main where
 
 import Control.Applicative hiding ((<|>), some)
 import Data.Either.Combinators
+import Data.Function
 import Data.Maybe
 import Data.Void
 import Text.Parsec
 import Text.Parsec.Char
-import Data.Function
-
-import Debug.Trace
 
 type Parser = Parsec String ()
 
@@ -25,37 +23,37 @@ data Op
   deriving (Show)
 
 toOp :: Char -> Op
-toOp = fromJust . flip lookup [('+', Add), ('*', Mult), ('-', Sub), ('/', Div)] &* "converting to Op"
+toOp = fromJust . flip lookup [('+', Add), ('*', Mult), ('-', Sub), ('/', Div)]
 
 main = do
-  let x = "2.0+3"
+  let x = "-2.0"
   print $ parse (math <* eof) "" x
 
 numb :: Parser Math
-numb = Numb . read <$> double &* "getting numb"
+numb = Numb . read <$> double
 
 op :: Parser Op
-op = toOp <$> oneOf "+*-/" &* "getting op"
+op = toOp <$> oneOf "+*-/"
 
 expr :: Parser Math
-expr = Expr <$> math <*> op <*> math &* "getting expr"
+expr = Expr <$> math <*> op <*> math
 
 math :: Parser Math
-math = try numb <|> expr &* "getting math"
+math = try numb <|> expr
 
 double :: Parser String
-double = perhap minus id (:) <*> many1 digit <**> perhap decimal id (flip (++)) &* "getting double"
-
-minus :: Parser Char
-minus = char '-' &* "getting minus"
-
-decimal :: Parser String
-decimal = char '.' <:> many1 digit &* "getting decimal"
-
-infixl 0 &*
-a &* b = a & trace b
+double = char '-' ?: many1 digit <? (char '.' <:> many1 digit)
 
 -- Utility functions
 (<:>) = liftA2 (:)
 
 perhap parser def op = maybe def op <$> optionMaybe parser
+
+(?>) :: Semigroup a => Parser a -> Parser a -> Parser a
+mx ?> my = try (mx <> my) <|> my
+
+(?:) :: Parser a -> Parser [a] -> Parser [a]
+mx ?: mys = try (mx <:> mys) <|> mys
+
+(<?) :: Semigroup a => Parser a -> Parser a -> Parser a
+mx <? my = try (mx <> my) <|> mx
