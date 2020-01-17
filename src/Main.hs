@@ -36,6 +36,14 @@ op = toOp <$> oneOf "+*-/"
 expr :: Parser Math
 expr = Expr <$> math <*> op <*> math
 
+-- I've figured out why this doesn't work.
+--
+-- `try numb` doesn't actually fail on an expression - it reads the first number
+-- successfully. Only after that does the entire `math` parser fail on the
+-- unexpected operator.
+--
+-- But I can't flip `numb` and `expr`, because that leads to infinite recursion
+-- without end.
 math :: Parser Math
 math = try numb <|> expr
 
