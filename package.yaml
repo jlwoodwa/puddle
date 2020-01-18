@@ -15,8 +15,9 @@ dependencies:
   - base >= 4.7 && < 5
   - parsec
   - either
-  - free
   - extra
+  - unordered-containers
+
 
 executables:
   puddle:
