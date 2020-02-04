@@ -4,7 +4,8 @@ import Data.HashMap.Strict
 
 main = print $ evalE empty expression
 
-expression = Math Eq (Math Add (Math Sub (Numb 2.3) (Numb (-2))) (Numb 300)) (Numb 304.3)
+expression =
+  Math Eq (Math Add (Math Sub (Numb 2.3) (Numb (-2))) (Numb 300)) (Numb 304.3)
 
 data Expr
   = Numb Double
