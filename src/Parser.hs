@@ -34,5 +34,8 @@ parseV = handler . parse (linexp <* eof) ""
 parseC :: String -> LCode
 parseC = handler . parse (lcode <* eof) ""
 
+parseSt :: String -> LStatement
+parseSt = handler . parse lstatement ""
+
 handler :: Either ParseError a -> a
 handler = either (error . show) $ id
