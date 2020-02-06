@@ -1,5 +1,7 @@
 module SyntaxList where
 
+data LCode = LAssign String LinearExpr
+
 data LinearExpr = Cons ValPar Op LinearExpr | Last ValPar deriving (Show)
 
 snoc :: (Op, ValPar) -> LinearExpr -> LinearExpr

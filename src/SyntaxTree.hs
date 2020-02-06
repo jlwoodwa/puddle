@@ -23,3 +23,8 @@ enforestWalk e1 o e2@(Cons vp o' e3) =
 vp2tree :: ValPar -> TreeExpr
 vp2tree (Val v) = Leaf v
 vp2tree (Par x) = enforest x
+
+data TCode = TAssign String TreeExpr deriving Show
+
+enforestC :: LCode -> TCode
+enforestC (LAssign var x) = TAssign var $ enforest x
