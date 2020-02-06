@@ -1,17 +1,25 @@
 module Parser where
 
-data LinearExpr = Cons ValPar Op LinearExpr | Last ValPar deriving (Show)
+import SyntaxList
 
-snoc :: (Op, ValPar) -> LinearExpr -> LinearExpr
-snoc x (Cons vp o xs) = Cons vp o (snoc x xs)
-snoc (o, vp2) (Last vp1) = Cons vp1 o (Last vp2)
+import Text.Parsec
 
-data ValPar = Val Symb | Par LinearExpr deriving Show
+type Parser = Parsec String ()
 
-data Op = Add | Mult deriving Show
+valpar :: Parser ValPar
+valpar = try (char '(' *> (Par <$> linexp) <* char ')') <|> (Val . Num . read ) <$> many1 digit
 
-binding :: Op -> Int
-binding Add = 0
-binding Mult = 1
+op :: Parser Op
+op = toOp <$> oneOf ops
 
-data Symb = Num Int | Var String deriving Show
+linexp :: Parser LinearExpr
+linexp = try (Cons <$> valpar <*> op <*> linexp) <|> Last <$> valpar
+
+-- utilities
+
+parseV :: String -> LinearExpr
+parseV = handler . parse (linexp <* eof) ""
+
+handler :: Either ParseError a -> a
+handler = either (error . show) $ id
+

@@ -1,6 +1,7 @@
 module Main where
 
+import SyntaxList
+import SyntaxTree
 import Parser
-import Enforester
 
-main = print $ enforest linearExample
+main = print $ enforest $ parseV "2+3"
