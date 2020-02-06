@@ -16,7 +16,7 @@ dependencies:
   - parsec
   - either
   - extra
-  - unordered-containers
+  - containers
 
 
 executables:
