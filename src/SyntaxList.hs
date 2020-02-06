@@ -1,6 +1,8 @@
 module SyntaxList where
 
-data LCode = LAssign String LinearExpr
+data LStatement = LAssign String LinearExpr | LPrint LinearExpr | LRead String deriving Show
+
+type LCode = [LStatement]
 
 data LinearExpr = Cons ValPar Op LinearExpr | Last ValPar deriving (Show)
 
@@ -10,12 +12,13 @@ snoc (o, vp2) (Last vp1) = Cons vp1 o (Last vp2)
 
 data ValPar = Val Symb | Par LinearExpr deriving Show
 
-data Op = Add | Mult deriving Show
+data Op = Add | Mult | Leq deriving Show
 
-toOp '+' = Add
-toOp '*' = Mult
+toOp "+" = Add
+toOp "*" = Mult
+toOp "<=" = Leq
 
-ops = "+*"
+ops = ["+","*","<="]
 
 binding :: Op -> Int
 binding Add = 0
