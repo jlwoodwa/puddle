@@ -28,4 +28,4 @@ repl env = do
 main' = evalC $ enforestC $ parseC "read x;\nprint x*2;"
 
 -- utilities
-prompt x = putStr x >> hFlush stdout >> getline
+prompt x = putStr x >> hFlush stdout >> getLine
