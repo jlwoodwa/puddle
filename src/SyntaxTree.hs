@@ -24,7 +24,12 @@ vp2tree :: ValPar -> TreeExpr
 vp2tree (Val v) = Leaf v
 vp2tree (Par x) = enforest x
 
-data TStatement = TAssign String TreeExpr | TPrint TreeExpr | TRead String deriving Show
+data TStatement
+  = TAssign String TreeExpr
+  | TPrint TreeExpr
+  | TRead String
+  deriving (Show)
+
 type TCode = [TStatement]
 
 enforestSt :: LStatement -> TStatement
