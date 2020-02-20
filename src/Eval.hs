@@ -15,8 +15,8 @@ evalSt (TRead v) env =
   putStrLn ("enter " ++ show v) >> (readLn :: IO Int) >>= \x ->
     return $ insert v (IntV x) env
 
-evalC :: TCode -> IO ()
-evalC code = void $ foldl (>>=) (return empty) $ map evalSt code
+evalC :: TCode -> Env -> IO Env
+evalC code env = foldl (>>=) (return env) $ map evalSt code
 
 evalV :: Env -> TreeExpr -> Val
 evalV env (Node op x y) = (evalO op) (evalV env x) (evalV env y)
