@@ -8,15 +8,13 @@ type Parser = Parsec String ()
 
 valpar :: Parser ValPar
 valpar =
-  (<* spaces) $
-  (spaces *>) $
+  wrapSpaces $
   try (char '(' *> (Par <$> linexp) <* char ')') <|>
-  (Val . Num . read) <$> many1 digit <|>
-  (Val . Var) <$> many1 alpha
+  Val . Num . read <$> many1 digit <|>
+  Val . Var <$> many1 alpha
 
 op :: Parser Op
-op =
-  (<* spaces) $ (spaces *>) $ toOp <$> (foldr1 (<|>) $ map (try . string) ops)
+op = wrapSpaces $ toOp <$> foldr1 (<|>) (map (try . string) ops)
 
 linexp :: Parser LinearExpr
 linexp = try (Cons <$> valpar <*> op <*> linexp) <|> Last <$> valpar
@@ -44,4 +42,7 @@ parseSt :: String -> LStatement
 parseSt = handler . parse lstatement ""
 
 handler :: Either ParseError a -> a
-handler = either (error . show) $ id
+handler = either (error . show) id
+
+wrapSpaces :: Parser a -> Parser a
+wrapSpaces = (<* spaces) . (spaces *>)

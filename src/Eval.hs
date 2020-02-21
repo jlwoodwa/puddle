@@ -19,7 +19,7 @@ evalC :: TCode -> Env -> IO Env
 evalC code env = foldl (>>=) (return env) $ map evalSt code
 
 evalV :: Env -> TreeExpr -> Val
-evalV env (Node op x y) = (evalO op) (evalV env x) (evalV env y)
+evalV env (Node op x y) = evalO op (evalV env x) (evalV env y)
 evalV env (Leaf (Num x)) = IntV x
 evalV env (Leaf (Var x)) = env ! x
 

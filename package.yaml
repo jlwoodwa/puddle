@@ -17,6 +17,7 @@ dependencies:
   - either
   - extra
   - containers
+  - monad-loops
 
 
 executables:
