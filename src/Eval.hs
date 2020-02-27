@@ -3,8 +3,7 @@ module Eval where
 import SyntaxList
 import SyntaxTree
 
-import Control.Monad
-import Data.Map.Strict hiding (foldl, map)
+import Data.Map.Strict hiding (foldl, foldl', map)
 
 type Env = Map String Val
 
@@ -20,7 +19,7 @@ evalC code env = foldl (>>=) (return env) $ map evalSt code
 
 evalV :: Env -> TreeExpr -> Val
 evalV env (Node op x y) = evalO op (evalV env x) (evalV env y)
-evalV env (Leaf (Num x)) = IntV x
+evalV _ (Leaf (Num x)) = IntV x
 evalV env (Leaf (Var x)) = env ! x
 
 evalO :: Op -> Val -> Val -> Val -- Note: this function is clunky

@@ -28,23 +28,28 @@ data Op
   | Leq
   deriving (Show)
 
+toOp :: String -> Op
 toOp "+" = Add
 toOp "*" = Mult
 toOp "<=" = Leq
+toOp x = error $ "operation " ++ x ++ " not supported"
 
+ops :: [String]
 ops = ["+", "*", "<="]
 
 binding :: Op -> Int
 binding Add = 0
 binding Mult = 1
+binding x = error $ "binding level not found for " ++ show x
 
 maxOpBinding :: LinearExpr -> Int
 maxOpBinding (Cons _ o1 (Cons _ o2 xs)) =
   max (binding o1) $ max (binding o2) (maxOpBinding xs)
 maxOpBinding (Cons _ o _) = binding o
+maxOpBinding _ = error "Can't find maximum binding level of no operators."
 
 geqs :: Op -> LinearExpr -> Bool
-geqs o (Last _) = True
+geqs _ (Last _) = True
 geqs o x = binding o >= maxOpBinding x
 
 data Symb
@@ -52,5 +57,6 @@ data Symb
   | Var String
   deriving (Show)
 
+linearExample :: LinearExpr
 linearExample =
   Cons (Val $ Num 5) Mult $ Cons (Val $ Num 2) Add (Last $ Val $ Num 3)

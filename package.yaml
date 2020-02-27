@@ -14,13 +14,60 @@ extra-source-files:
 dependencies:
   - base >= 4.7 && < 5
   - parsec
-  - either
-  - extra
   - containers
   - monad-loops
+  - text
+  - mtl
+  - lens
 
 
 executables:
   puddle:
     source-dirs:      src
     main:             Main.hs
+
+ghc-options:
+  - -Wall
+  - -Wcompat
+  - -Wincomplete-record-updates
+  - -Wincomplete-uni-patterns
+  - -Wredundant-constraints
+  - -Wunused-imports
+
+default-extensions:
+  # Trivial
+  [ EmptyCase
+  , FlexibleContexts
+  , FlexibleInstances
+  , InstanceSigs
+  , MultiParamTypeClasses
+  # Convenience
+  , LambdaCase
+  , MultiWayIf
+  , NamedFieldPuns
+  , TupleSections
+  # `deriving` extensions
+  , DeriveFoldable
+  , DeriveFunctor
+  , DeriveGeneric
+  , DeriveLift
+  , DeriveTraversable
+  , DerivingStrategies
+  , GeneralizedNewtypeDeriving
+  # Syntax adjustments
+  , BangPatterns
+  , KindSignatures
+  , TypeOperators
+  # String overloading
+  , OverloadedStrings
+  # Type annotation
+  , ScopedTypeVariables
+  , TypeApplications
+  # Type extensions
+  , ConstraintKinds
+  , RankNTypes
+  # More syntax adjustments
+  , ApplicativeDo
+  , DefaultSignatures
+  , PatternSynonyms
+  ]

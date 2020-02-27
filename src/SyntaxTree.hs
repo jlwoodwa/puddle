@@ -14,7 +14,7 @@ enforest (Cons vp1 o (Last vp2)) = Node o (vp2tree vp1) (vp2tree vp2)
 enforest (Cons vp o x) = enforestWalk (Last vp) o x
 
 enforestWalk :: LinearExpr -> Op -> LinearExpr -> TreeExpr
-enforestWalk e1 o e2@(Last vp) = Node o (enforest e1) (enforest e2)
+enforestWalk e1 o e2@(Last _) = Node o (enforest e1) (enforest e2)
 enforestWalk e1 o e2@(Cons vp o' e3) =
   if o `geqs` e1 && o `geqs` e2
     then Node o (enforest e1) (enforest e2)
