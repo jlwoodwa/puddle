@@ -12,7 +12,7 @@ evaluate :: Expr -> Puddle Value
 evaluate (Value x) = return x
 evaluate (Variable x) = do
   x' <- use $ varTable . at x
-  maybe (throwError SymbolNotFound) return x'
+  maybe (throwError $ SymbolNotFound x) return x'
 evaluate (Assign s e) = do
   v <- evaluate e
   varTable %= M.insert s v
@@ -21,7 +21,7 @@ evaluate (Call f xs) = do
   f' <- use $ funTable . at f
   case f' of
     Just f'' -> f'' =<< mapM evaluate xs
-    Nothing -> throwError SymbolNotFound
+    Nothing -> throwError $ SymbolNotFound f
 evaluate (Prim f xs) = do
   let f' = primTable ^. at f
   case f' of
@@ -46,4 +46,3 @@ evaluate (While b d) = do
       evaluate (While b d)
     Bool False -> return Unit
     _ -> throwError $ TypeError "Can't use non-booleans as conditions."
-evaluate (Print x) = evaluate x >>= liftIO . print >> return Unit

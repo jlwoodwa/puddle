@@ -6,8 +6,8 @@ data Expr
   = Value Value
   | Variable Symb
   | Assign Symb Expr
-  | Call Symb [Expr]
   | Prim Symb [Expr]
+  | Call Symb [Expr]
   | If Expr Expr Expr
   | While Expr Expr
-  | Print Expr
+  deriving (Show)

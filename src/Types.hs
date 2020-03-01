@@ -20,7 +20,7 @@ data Exc
   = DivByZero
   | TypeError Text
   | ArgError Text
-  | SymbolNotFound
+  | SymbolNotFound Text
   | SomeException Text
   deriving (Show)
 
