@@ -19,6 +19,8 @@ dependencies:
   - mtl
   - lens
   - either
+  - monad-loops
+  - exceptions
 
 
 executables:
