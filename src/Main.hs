@@ -1,32 +1,39 @@
+{-# LANGUAGE LambdaCase #-}
+
 module Main where
 
-import AST
-import Evaluation
-import SExprs
-import Types
-
-import Control.Monad.Catch (catch)
+import Control.Applicative.Tools
 import Control.Monad.Except
 import Control.Monad.Loops
 import Control.Monad.State.Strict
 import Data.Either.Combinators
+import Data.Function ((&))
 import Data.List
 import Data.Map.Strict
+import Data.Text (pack)
+import Evaluation
 import Parser
+import SExprs
 import System.IO
 import Text.Parsec
+import Types
 
-main = void $ runExceptT (runStateT repl $ Env empty empty)
+main :: IO ()
+main = void $ runExceptT $ runStateT (runPuddle repl) $ Env empty empty
 
+repl :: Puddle void
 repl = do
   code' <- liftIO $ prompt "- "
   code <-
     if code' == ":{"
-      then fmap (intercalate "\n") $
-           unfoldWhileM (/= ":}") $ liftIO $ prompt "$ "
+      then intercalate "\n" <.> unfoldWhileM (/= ":}") . liftIO $ prompt "$ "
       else return code'
-  catch (evaluate undefined) undefined
+  liftIO . print =<< case parse sexpr "" (pack code) of
+    Right expression -> evaluate $ sexpr2expr $ expression
+    Left _ -> undefined
+  repl
 
+prompt :: String -> IO String
 prompt x = putStr x >> hFlush stdout >> getLine
 --main :: IO ()
 --main =

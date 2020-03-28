@@ -1,48 +1,35 @@
+{-# LANGUAGE LambdaCase #-}
+
 module Evaluation where
 
 import AST
-import Primitives
-import Types
-
 import Control.Lens
 import Control.Monad.Except
 import qualified Data.Map.Strict as M
+import Primitives
+import Types
 
 evaluate :: Expr -> Puddle Value
 evaluate (Value x) = return x
-evaluate (Variable x) = do
-  x' <- use $ varTable . at x
-  maybe (throwError $ SymbolNotFound x) return x'
-evaluate (Assign s e) = do
-  v <- evaluate e
-  varTable %= M.insert s v
-  return Unit
-evaluate (Call f xs) = do
-  f' <- use $ funTable . at f
-  case f' of
-    Just f'' -> f'' =<< mapM evaluate xs
-    Nothing -> throwError $ SymbolNotFound f
-evaluate (Prim f xs) = do
-  let f' = primTable ^. at f
-  case f' of
-    Just f'' -> do
-      xs' <- mapM evaluate xs
-      f'' xs'
-    Nothing ->
-      throwError $
-      SomeException
-        "Internal error: symbol recognized as primitive but not present in primTable"
-evaluate (If b i e) = do
-  b' <- evaluate b
-  case b' of
-    Bool True -> evaluate i
-    Bool False -> evaluate e
-    _ -> throwError $ TypeError "Can't use non-booleans as conditions."
-evaluate (While b d) = do
-  b' <- evaluate b
-  case b' of
-    Bool True -> do
-      _ <- evaluate d
-      evaluate (While b d)
-    Bool False -> return Unit
-    _ -> throwError $ TypeError "Can't use non-booleans as conditions."
+evaluate (Variable x) =
+  use (varTable . at x) >>= maybe (throwError $ SymbolNotFound x) return
+evaluate (Assign s e) =
+  unit $ evaluate e >>= \v -> varTable %= M.insert s v
+evaluate (Call f xs) =
+  use (funTable . at f) >>= maybe (throwError $ SymbolNotFound f) (mapM evaluate xs >>=)
+evaluate (Prim f xs) =
+  maybe
+    (throwError $ SomeException "Internal error: symbol recognized as primitive but not present in primTable")
+    (mapM evaluate xs >>=)
+    (primTable ^. at f)
+evaluate (If b i e) = evaluate b >>= \case
+  Bool True -> evaluate i
+  Bool False -> evaluate e
+  _ -> throwError $ TypeError "Can't use non-booleans as conditions."
+evaluate (While b d) = evaluate b >>= \case
+  Bool True -> evaluate d >> evaluate (While b d)
+  Bool False -> return Unit
+  _ -> throwError $ TypeError "Can't use non-booleans as conditions."
+
+unit :: Monad m => m a -> m Value
+unit = (>> return Unit)

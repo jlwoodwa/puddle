@@ -20,7 +20,7 @@ dependencies:
   - lens
   - either
   - monad-loops
-  - exceptions
+  - yjtools
 
 
 executables:
