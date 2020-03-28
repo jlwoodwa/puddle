@@ -72,4 +72,6 @@ default-extensions:
   , ApplicativeDo
   , DefaultSignatures
   , PatternSynonyms
+  # et cetera
+  , BlockArguments
   ]

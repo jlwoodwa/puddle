@@ -18,7 +18,7 @@ ptoken = pack <$> many1 (satisfy validChar)
 
 manyS :: Parser SExpr
 manyS =
-  char '(' *> (Many <$> (sepBy1 sexpr (pack <$> (many1 space)))) <* char ')'
+  char '(' *> (Many <$> sepBy1 sexpr (pack <$> many1 space)) <* char ')'
 
 sexpr :: Parser SExpr
 sexpr = manyS <|> (Slot <$> ptoken)

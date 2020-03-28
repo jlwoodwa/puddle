@@ -6,6 +6,7 @@ data Expr
   = Value Value
   | Variable Symb
   | Assign Symb Expr
+  | Fun Symb [Symb] [Expr]
   | Prim Symb [Expr]
   | Call Symb [Expr]
   | If Expr Expr Expr

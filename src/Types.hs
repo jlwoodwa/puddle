@@ -14,7 +14,10 @@ data Value
   = Unit
   | Bool Bool
   | Int Int
-  deriving (Show)
+  deriving
+    ( Show,
+      Eq
+    )
 
 data Exc
   = DivByZero
@@ -22,26 +25,28 @@ data Exc
   | ArgError Text
   | SymbolNotFound Text
   | SomeException Text
-  deriving (Show)
+  deriving
+    (Show)
 
-newtype Puddle a =
-  Puddle
-    { runPuddle :: StateT Env (ExceptT Exc IO) a
-    }
-  deriving ( Functor
-           , Applicative
-           , Monad
-           , MonadError Exc
-           , MonadState Env
-           , MonadIO
-           )
+newtype Puddle a
+  = Puddle
+      { runPuddle :: StateT Env (ExceptT Exc IO) a
+      }
+  deriving
+    ( Functor,
+      Applicative,
+      Monad,
+      MonadError Exc,
+      MonadState Env,
+      MonadIO
+    )
 
 type Function = [Value] -> Puddle Value
 
-data Env =
-  Env
-    { _varTable :: Map Symb Value
-    , _funTable :: Map Symb ([Value] -> Puddle Value)
-    }
+data Env
+  = Env
+      { _varTable :: [Map Symb Value],
+        _funTable :: Map Symb ([Value] -> Puddle Value)
+      }
 
 makeLenses ''Env
