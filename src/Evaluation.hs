@@ -26,12 +26,21 @@ evaluate (Variable s) =
 -- use (varTable . at s) >>= maybe (throwError $ SymbolNotFound s) return
 evaluate (Assign s e) =
   unit $ evaluate e >>= \v -> varTable . ix 0 %= M.insert s v
-evaluate (Fun s params e) = unit $ funTable %= M.insert s \args -> undefined
+evaluate (Fun s params e) = unit $
+  funTable . ix 0 %= M.insert s \args -> do
+    funTable %= (M.empty :)
+    varTable %= (M.fromList (zip params args) :)
+    v <- evaluate e
+    varTable %= tail
+    funTable %= tail
+    return v
 evaluate (Call f xs) =
-  use (funTable . at f)
-    >>= maybe
-      (throwError $ SymbolNotFound f)
-      (mapM evaluate xs >>=)
+  get
+    <&> ( _funTable >>> (foldl1' $ merge preserveMissing preserveMissing $ zipWithMatched $ const const)
+            >>> (M.!? f)
+        )
+      >>= maybe (throwError $ SymbolNotFound f) (mapM evaluate xs >>=)
+--  use (funTable . at f) >>= maybe (throwError $ SymbolNotFound f) (mapM evaluate xs >>=)
 evaluate (Prim f xs) =
   maybe
     ( error

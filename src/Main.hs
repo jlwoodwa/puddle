@@ -17,7 +17,7 @@ import Text.Parsec
 import Types
 
 main :: IO ()
-main = void $ runExceptT $ runStateT (runPuddle repl) $ Env [empty] empty
+main = void $ runExceptT $ runStateT (runPuddle repl) $ Env [empty] [empty]
 
 repl :: Puddle void
 repl =

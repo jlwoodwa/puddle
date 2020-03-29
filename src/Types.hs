@@ -46,7 +46,7 @@ type Function = [Value] -> Puddle Value
 data Env
   = Env
       { _varTable :: [Map Symb Value],
-        _funTable :: Map Symb ([Value] -> Puddle Value)
+        _funTable :: [Map Symb Function]
       }
 
 makeLenses ''Env
